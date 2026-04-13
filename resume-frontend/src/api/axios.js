@@ -1,11 +1,12 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: import.meta.env.VITE_API_URL
+    ? `${import.meta.env.VITE_API_URL}/api`
+    : "/api",
 });
 
 api.interceptors.request.use((config) => {
-  // Don't send auth header on login/register endpoints
   if (config.url && config.url.includes("/auth/")) {
     return config;
   }
