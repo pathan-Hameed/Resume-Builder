@@ -1,0 +1,20 @@
+services:
+  - type: web
+    name: resume-builder-backend
+    runtime: java
+    rootDir: Resume_Building-backend
+    buildCommand: mvn clean install -DskipTests
+    startCommand: java -jar target/*.jar
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: DATABASE_USERNAME
+        sync: false
+      - key: DATABASE_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_EXPIRATION
+        sync: false
+      - key: PORT
+        value: 8080
