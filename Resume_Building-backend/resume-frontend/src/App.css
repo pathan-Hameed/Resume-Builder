@@ -1,0 +1,53 @@
+body {
+  background: #0f172a;
+  color: #e5e7eb;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.card {
+  background: #020617;
+  border: 1px solid #1e293b;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.card h2 {
+  margin-bottom: 16px;
+}
+
+/* 🔒 SCOPED FORM STYLES */
+.card input {
+  width: 96%;
+  padding: 10px 12px;
+  margin-bottom: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  background: #020617;
+  color: #e5e7eb;
+}
+
+.card input::placeholder {
+  color: #64748b;
+}
+
+.card button {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.card button:hover {
+  background: #1d4ed8;
+}
+.container {
+  max-width: 800px;
+  margin: 80px auto;
+  padding: 20px;
+}
