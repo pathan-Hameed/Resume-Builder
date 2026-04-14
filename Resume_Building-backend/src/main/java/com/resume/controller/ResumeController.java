@@ -16,7 +16,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/resumes")
-@CrossOrigin(origins = "http://localhost:5173")
+
 public class ResumeController {
 
     private final ResumeService resumeService;
@@ -50,8 +50,7 @@ public class ResumeController {
     public Resume update(
             @PathVariable Long id,
             @RequestBody ResumeRequest req,
-            Authentication auth
-    ) {
+            Authentication auth) {
         return resumeService.updateResume(id, req, currentUser(auth));
     }
 
@@ -59,12 +58,11 @@ public class ResumeController {
     public void delete(@PathVariable Long id, Authentication auth) {
         resumeService.deleteResume(id, currentUser(auth));
     }
-    
+
     @GetMapping("/{id}/pdf")
     public ResponseEntity<byte[]> downloadPdf(
             @PathVariable Long id,
-            Authentication auth
-    ) {
+            Authentication auth) {
         User user = userService.findByEmail(auth.getName());
         byte[] pdf = resumeService.generatePdf(id, user);
 

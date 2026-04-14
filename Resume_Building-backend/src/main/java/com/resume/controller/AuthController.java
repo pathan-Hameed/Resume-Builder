@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+
 public class AuthController {
 
     private final UserService userService;
@@ -17,8 +18,8 @@ public class AuthController {
     private final JwtUtil jwtUtil;
 
     public AuthController(UserService userService,
-                          AuthenticationManager authManager,
-                          JwtUtil jwtUtil) {
+            AuthenticationManager authManager,
+            JwtUtil jwtUtil) {
         this.userService = userService;
         this.authManager = authManager;
         this.jwtUtil = jwtUtil;
@@ -33,7 +34,8 @@ public class AuthController {
         } catch (Exception e) {
             String msg = e.getMessage();
             if (msg != null && msg.contains("Duplicate")) {
-                return ResponseEntity.badRequest().body("Email already registered. Please use a different email or login.");
+                return ResponseEntity.badRequest()
+                        .body("Email already registered. Please use a different email or login.");
             }
             return ResponseEntity.badRequest().body("Registration failed. Please try again.");
         }
@@ -41,19 +43,16 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody User user) {
-    	System.out.println("Login attempt for email: " + user.getEmail());
+        System.out.println("Login attempt for email: " + user.getEmail());
 
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         user.getEmail(),
-                        user.getPassword()
-                )
-        );
+                        user.getPassword()));
 
         User dbUser = userService.findByEmail(user.getEmail());
 
-        String token =
-                jwtUtil.generateToken(dbUser.getEmail(), dbUser.getId());
+        String token = jwtUtil.generateToken(dbUser.getEmail(), dbUser.getId());
 
         return ResponseEntity.ok(token);
     }
