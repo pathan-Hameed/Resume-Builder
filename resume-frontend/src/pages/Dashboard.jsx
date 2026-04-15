@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import Sidebar from "../components/Sidebar";
+import TopNavbar from "../components/TopNavbar";
 import ResumeForm from "../resume/ResumeForm";
 import ResumeList from "./ResumeList";
 import { getMyResumes } from "../api/resumeApi";
@@ -7,10 +9,18 @@ import "../App.css";
 export default function Dashboard() {
   const [resumes, setResumes] = useState([]);
   const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const loadResumes = async () => {
-    const res = await getMyResumes();
-    setResumes(res.data);
+    setLoading(true);
+    try {
+      const res = await getMyResumes();
+      setResumes(res.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -22,78 +32,77 @@ export default function Dashboard() {
     setShowForm(false);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    window.location.href = "/login";
+  };
+
   return (
-    <div className="dashboard">
-      {/* Top Navbar */}
-      <nav className="navbar">
-        <div className="navbar-inner">
-          <div className="navbar-brand">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-              <polyline points="14 2 14 8 20 8"/>
-              <line x1="16" y1="13" x2="8" y2="13"/>
-              <line x1="16" y1="17" x2="8" y2="17"/>
-            </svg>
-            <span>Resume Builder</span>
-          </div>
-          <button
-            className="btn-ghost"
-            onClick={() => {
-              localStorage.removeItem("token");
-              window.location.href = "/login";
-            }}
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-              <polyline points="16 17 21 12 16 7"/>
-              <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
-          </button>
-        </div>
-      </nav>
+    <div className="app-shell">
+      <Sidebar />
+      <div className="page-shell">
+        <TopNavbar onLogout={handleLogout} />
 
-      {/* Main Content */}
-      <main className="dashboard-main">
-        {/* Header Section */}
-        <div className="dashboard-header">
-          <div>
-            <h1>My Resumes</h1>
-            <p className="text-muted">Create and manage your professional resumes</p>
-          </div>
-          <button className="btn-primary" onClick={() => setShowForm(!showForm)}>
-            {showForm ? (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"/>
-                  <line x1="6" y1="6" x2="18" y2="18"/>
-                </svg>
-                Close
-              </>
+        <main className="page-content">
+          <section className="dashboard-hero">
+            <div>
+              <p className="eyebrow">Welcome back</p>
+              <h1>Build polished resumes in minutes</h1>
+              <p className="section-copy">
+                Manage your resume projects with a clean dashboard, fast saving,
+                and PDF export.
+              </p>
+            </div>
+
+            <button
+              type="button"
+              className="btn-primary hero-cta"
+              onClick={() => setShowForm(!showForm)}
+            >
+              {showForm ? "Close resume form" : "Create new resume"}
+            </button>
+          </section>
+
+          <section className="stats-grid">
+            <div className="stat-card">
+              <span className="stat-label">Total resumes</span>
+              <h2>{resumes.length}</h2>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">Recent activity</span>
+              <p>
+                {resumes.length > 0
+                  ? "Resumes updated recently"
+                  : "Create your first resume today"}
+              </p>
+            </div>
+            <div className="stat-card">
+              <span className="stat-label">Quick start</span>
+              <p>
+                Add a resume, preview your content, then export a polished PDF.
+              </p>
+            </div>
+          </section>
+
+          {showForm && (
+            <section className="panel slide-in">
+              <ResumeForm onSaved={handleSaved} />
+            </section>
+          )}
+
+          <section className="panel">
+            {loading ? (
+              <div className="skeleton-grid" aria-label="Loading resumes">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <div key={index} className="skeleton-card" />
+                ))}
+              </div>
             ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="12" y1="5" x2="12" y2="19"/>
-                  <line x1="5" y1="12" x2="19" y2="12"/>
-                </svg>
-                New Resume
-              </>
+              <ResumeList resumes={resumes} onChanged={loadResumes} />
             )}
-          </button>
-        </div>
-
-        {/* Resume Form (collapsible) */}
-        {showForm && (
-          <div className="card slide-in">
-            <ResumeForm onSaved={handleSaved} />
-          </div>
-        )}
-
-        {/* Resume List */}
-        <div className="card">
-          <ResumeList resumes={resumes} onChanged={loadResumes} />
-        </div>
-      </main>
+          </section>
+        </main>
+      </div>
     </div>
   );
 }
